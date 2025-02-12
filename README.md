@@ -1,7 +1,6 @@
 
-# README.md: In-Place Integer Sorting Algorithm
+# README.md: In-Place Integer Sorting Algorithm (Reconstruct-Sort or Counting Sort 2)
 
-This document explains an in-place sorting algorithm designed for a specific type of integer list. The algorithm is described in detail in `reconstruct.md`.  Here's a summary:
 
 ## Overview
 
