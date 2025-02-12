@@ -537,5 +537,5 @@ if __name__ == "__main__":
     sorted_list = inplace_sorting(my_list, max_val)
     print(f"List sorted in {time.time() - start_time} seconds.")
 ```
-#Benchmarks
+# Benchmarks
 As you can see when the k is small, counting sort and Deconstruction sort have the same performance but when we increase the k for example to 1 million, we clearly see the difference between these 2, because 1 is O(n+k) and another is O(n):
