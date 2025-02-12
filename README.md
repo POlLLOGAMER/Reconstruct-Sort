@@ -164,5 +164,5 @@ if __name__ == "__main__":
     print("Execution time: {:.6f} seconds".format(end - start))
 ```
 
-# A continuacion veran una grafica el cual refleja la relacion tiempo-operacion de este algoritmo
+# Below you will see a graph which reflects the time-operation relationship of this algorithm
 ![Texto alternativo](/Graph.png)
