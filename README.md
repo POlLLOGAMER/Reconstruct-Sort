@@ -106,7 +106,7 @@ Let's use the input `my_list = [2, 0, 1, 2, 3, 0, 0, 4, 9, 7]` and `n = 10`.
 
 Finally, `temp` is copied to `my_list`.
 
-Here is the code of Deconstruct Sort
+Here is the code of Deconstruct Sort:
 
 ```
 import time
@@ -164,3 +164,4 @@ if __name__ == "__main__":
     print("Execution time: {:.6f} seconds".format(end - start))
 ```
 
+# A continuacion veran una grafica el cual refleja la relacion tiempo-operacion de este algoritmo
