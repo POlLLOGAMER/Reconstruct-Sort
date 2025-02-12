@@ -1,4 +1,4 @@
-```markdown
+
 # README.md: In-Place Integer Sorting Algorithm
 
 This document explains an in-place sorting algorithm designed for a specific type of integer list. The algorithm is described in detail in `reconstruct.md`.  Here's a summary:
