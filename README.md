@@ -539,7 +539,7 @@ if __name__ == "__main__":
 
 ```
 # Benchmarks
-As you can see when the k (range) is small, counting sort and Deconstruction sort have the same performance but when we increase the range for example to 1 million, we clearly see the difference between these 2, because 1 is O(n+k) and another is O(n):
+As you can see when the k (range) is small, counting sort and Deconstruction sort (Counting sort 2) have the same performance but when we increase the range for example to 1 million, we clearly see the difference between these 2, because 1 is O(n+k) and another is O(n):
 ![](/1millonrage.png)
 ```
 import random
