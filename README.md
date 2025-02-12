@@ -506,19 +506,19 @@ import time
 def inplace_sorting(lst, max_val):
     n = len(lst)
     for num in lst:
-        if not (0 <= num <= max_val):  # Asegurarse que los números están dentro del rango
+        if not (0 <= num <= max_val):  # Ensure the numbers are within the range
             raise ValueError(f"All numbers must be in the range [0, {max_val}]")
 
-    # Realizar el conteo de frecuencia usando la técnica de "in-place"
+    # Perform the frequency counting using the "in-place" technique
     for i in range(n):
-        index = lst[i] % (max_val + 1)  # Generar el índice dentro de un rango válido
+        index = lst[i] % (max_val + 1)  # Generate the index within a valid range
         if index < n:
-            lst[index] += n  # Sumar n para marcar el valor sin sobrescribir la lista
+            lst[index] += n  # Add n to mark the value without overwriting the list
 
     pos = 0
     temp = [0] * n
     for i in range(n):
-        freq = lst[i] // (max_val + 1)  # Obtener la frecuencia
+        freq = lst[i] // (max_val + 1)  # Get the frequency
         for _ in range(freq):
             temp[pos] = i
             pos += 1
@@ -527,15 +527,126 @@ def inplace_sorting(lst, max_val):
     return lst
 
 if __name__ == "__main__":
-    # Generar una lista aleatoria con valores hasta 1 millón
+    # Generate a random list with values up to 1 million
     max_val = 1000000
-    size = 10000  # Tamaño de la lista (puedes cambiarlo)
+    size = 10000  # List size (you can change it)
     my_list = [random.randint(0, max_val) for _ in range(size)]
 
-    # Ordenar la lista utilizando Counting Sort 2
+    # Sort the list using Counting Sort 2
     start_time = time.time()
     sorted_list = inplace_sorting(my_list, max_val)
     print(f"List sorted in {time.time() - start_time} seconds.")
+
 ```
 # Benchmarks
-As you can see when the k is small, counting sort and Deconstruction sort have the same performance but when we increase the k for example to 1 million, we clearly see the difference between these 2, because 1 is O(n+k) and another is O(n):
+As you can see when the k is small, counting sort and Deconstruction sort have the same performance but when we increase the range for example to 1 million, we clearly see the difference between these 2, because 1 is O(n+k) and another is O(n):
+![](URL-de-la-imagen)
+```
+import random
+import matplotlib.pyplot as plt
+
+# In-place Sorting Algorithm (Counting Sort 2)
+def inplace_sorting(lst, max_val):
+    n = len(lst)
+    operations = 0  # Operation counter
+    for num in lst:
+        if not (0 <= num <= max_val):  # Ensure numbers are within range
+            raise ValueError(f"All numbers must be in the range [0, {max_val}]")
+
+    # Perform frequency count using "in-place" technique
+    for i in range(n):
+        index = lst[i] % (max_val + 1)  # Generate index within a valid range
+        if index < n:
+            lst[index] += n  # Add n to mark the value without overwriting the list
+        operations += 1  # Count operation
+
+    pos = 0
+    temp = [0] * n
+    for i in range(n):
+        freq = lst[i] // (max_val + 1)  # Get the frequency
+        for _ in range(freq):
+            temp[pos] = i
+            pos += 1
+        operations += 1  # Count operation
+    for i in range(n):
+        lst[i] = temp[i]
+        operations += 1  # Count operation
+    return lst, operations
+
+# Classic Counting Sort Algorithm
+def counting_sort(lst, max_val):
+    operations = 0  # Operation counter
+    count = [0] * (max_val + 1)  # Use max_val + 1
+    output = [0] * len(lst)
+    for num in lst:
+        count[num] += 1
+        operations += 1  # Count operation
+    for i in range(1, max_val + 1):
+        count[i] += count[i - 1]
+        operations += 1  # Count operation
+    for num in reversed(lst):
+        output[count[num] - 1] = num
+        count[num] -= 1
+        operations += 1  # Count operation
+    return output, operations
+
+# Radix Sort Algorithm
+def radix_sort(lst, max_val):
+    operations = 0  # Operation counter
+    RADIX = 10
+    placement = 1
+    while max_val // placement > 0:
+        buckets = [list() for _ in range(RADIX)]
+        for i in lst:
+            buckets[i // placement % RADIX].append(i)
+            operations += 1  # Count operation
+        a = 0
+        for bucket in buckets:
+            for i in bucket:
+                lst[a] = i
+                a += 1
+                operations += 1  # Count operation
+        placement *= RADIX
+    return lst, operations
+
+# Function to plot operations
+def plot_operations():
+    max_val = 1000000  # Set k to 1 million
+    sizes = range(1000, 10001, 1000)  # From 1k to 10k in steps of 1k
+    inplace_ops = []
+    counting_ops = []
+    radix_ops = []
+
+    for size in sizes:
+        # Create a random list with values up to 1 million
+        my_list = [random.randint(0, max_val) for _ in range(size)]
+
+        # Measure operations for In-place Sorting (Counting Sort 2)
+        _, inplace_ops_count = inplace_sorting(my_list[:], max_val)
+        inplace_ops.append(inplace_ops_count)
+
+        # Measure operations for Classic Counting Sort
+        _, counting_ops_count = counting_sort(my_list[:], max_val)
+        counting_ops.append(counting_ops_count)
+
+        # Measure operations for Radix Sort
+        _, radix_ops_count = radix_sort(my_list[:], max_val)
+        radix_ops.append(radix_ops_count)
+
+        print(f"Size: {size}, In-place Operations: {inplace_ops[-1]}, Counting Operations: {counting_ops[-1]}, Radix Operations: {radix_ops[-1]}")
+
+    # Plot the results
+    plt.figure(figsize=(10, 6))
+    plt.plot(sizes, inplace_ops, label="In-place Sorting (Counting Sort 2)", color='blue')
+    plt.plot(sizes, counting_ops, label="Classic Counting Sort", color='green')
+    plt.plot(sizes, radix_ops, label="Radix Sort", color='red')
+    plt.xlabel('List Size')
+    plt.ylabel('Operations Count')
+    plt.title('Operations Count Comparison: Sorting Algorithms')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+if __name__ == "__main__":
+    plot_operations()
+```
