@@ -233,4 +233,266 @@ if __name__ == "__main__":
     plot_operations()
 
 ```
+# Below I will give the code so that you can view this algorithm in p5.js:
+```
 
+/*
+  p5.js Sketch: In-Place Frequency Sorting Animation
+
+  This sketch animates an algorithm that sorts an array of size n,
+  where every element is in the range [0, n). The algorithm works in two phases:
+  
+  1. Frequency Counting (in-place):
+     For each element, compute its "bucket" index as (value % n) and add n to that bucket.
+  
+  2. Rebuilding the Sorted Array:
+     For each index i, the frequency is (arr[i] // n). The number i is then inserted into a temporary
+     array as many times as it appears.
+  
+  Adjustable settings:
+    - n: the size of the array (and the range of values)
+    - speed: animation speed (in milliseconds per frame)
+  
+  Enjoy the dangerously quirky arithmetic acrobatics!
+*/
+
+let n = 100;        // Array size (and the range [0, n) for each element)
+let speed = 1;  // Time (in milliseconds) between animation frames
+
+let frames = [];   // Array to store each animation frame (state)
+let currentFrame = 0;
+let lastFrameTime = 0;
+
+function setup() {
+  createCanvas(800, 600);
+  frameRate(60);  // 60 fps—though we manually advance frames using our "speed" setting
+  
+  // Precompute the frames for the entire algorithm animation
+  frames = generateFrames(n);
+  lastFrameTime = millis();
+}
+
+function draw() {
+  background(240);
+
+  // Advance to the next frame if enough time has passed
+  if (millis() - lastFrameTime > speed && currentFrame < frames.length - 1) {
+    currentFrame++;
+    lastFrameTime = millis();
+  }
+  
+  // Display the current frame
+  displayFrame(frames[currentFrame]);
+}
+
+/*  
+  generateFrames(n)
+  -----------------
+  Simulates the algorithm step-by-step and records "frames" containing:
+    - phase: Which part of the algorithm is active
+    - description: A humorous description of the step
+    - arr: A copy of the main array’s current state
+    - temp: A copy of the temporary (sorted) array (if applicable)
+    - highlight: Object to mark indices or positions being processed
+*/
+function generateFrames(n) {
+  let frames = [];
+  
+  // Create the initial array with random integers in [0, n)
+  let arr = [];
+  for (let i = 0; i < n; i++) {
+    arr.push(Math.floor(random(n)));
+  }
+  
+  // Frame 0: Initial state
+  frames.push({
+    phase: "init",
+    description: "Initial array: [" + arr.join(", ") + "]\nWatch these numbers misbehave!",
+    arr: arr.slice(),
+    highlight: null,
+    temp: null
+  });
+  
+  // --------------------------
+  // Phase 1: Frequency Counting
+  // --------------------------
+  // For each element, compute the target bucket (using modulo) and add n to that bucket.
+  for (let i = 0; i < n; i++) {
+    let bucketIndex = arr[i] % n;
+    
+    // Frame: Before processing index i
+    frames.push({
+      phase: "freq",
+      description: `Processing arr[${i}] = ${arr[i]}: targeting bucket ${bucketIndex}`,
+      arr: arr.slice(),
+      highlight: { current: i, bucket: bucketIndex },
+      temp: null
+    });
+    
+    // Perform the in-place update: add n to the bucket at index bucketIndex
+    arr[bucketIndex] += n;
+    
+    // Frame: After updating the bucket
+    frames.push({
+      phase: "freq",
+      description: `Added ${n} to bucket ${bucketIndex}. New value: ${arr[bucketIndex]}`,
+      arr: arr.slice(),
+      highlight: { current: i, bucket: bucketIndex },
+      temp: null
+    });
+  }
+  
+  // Frame: After frequency counting is complete
+  frames.push({
+    phase: "after_freq",
+    description: "After frequency counting: [" + arr.join(", ") + "]\nBuckets are bulging with frequency!",
+    arr: arr.slice(),
+    highlight: null,
+    temp: null
+  });
+  
+  // -------------------------------
+  // Phase 2: Rebuilding the Sorted Array
+  // -------------------------------
+  let temp = new Array(n).fill(0);
+  let pos = 0;
+  
+  for (let i = 0; i < n; i++) {
+    // Calculate frequency: how many times the number i appears
+    let freq = Math.floor(arr[i] / n);
+    frames.push({
+      phase: "rebuild",
+      description: `Number ${i} appears ${freq} time(s). Preparing to insert...`,
+      arr: arr.slice(),
+      highlight: { bucket: i },
+      temp: temp.slice()
+    });
+    
+    // Insert the number i, freq times into the temp (sorted) array
+    for (let count = 0; count < freq; count++) {
+      temp[pos] = i;
+      frames.push({
+        phase: "rebuild",
+        description: `Inserting ${i} at sorted position ${pos}. Chaos, meet order!`,
+        arr: arr.slice(),
+        highlight: { bucket: i, pos: pos },
+        temp: temp.slice()
+      });
+      pos++;
+    }
+  }
+  
+  // Final frame: Sorted array completed!
+  frames.push({
+    phase: "final",
+    description: "Final sorted array: [" + temp.join(", ") + "]\nOrder restored... for now!",
+    arr: arr.slice(),
+    highlight: null,
+    temp: temp.slice()
+  });
+  
+  return frames;
+}
+
+/*
+  displayFrame(frame)
+  --------------------
+  Draws the current state of the algorithm:
+    - The description text at the top.
+    - The main array as a series of bars.
+    - If applicable, the temporary (sorted) array as bars below.
+  
+  The function also highlights the indices or positions currently in action.
+*/
+function displayFrame(frame) {
+  // Display the description text (with dangerously silly commentary)
+  fill(0);
+  textSize(16);
+  textAlign(LEFT, TOP);
+  text(frame.description, 20, 20);
+  
+  let margin = 20;
+  
+  // ---------------------
+  // Draw the Main Array
+  // ---------------------
+  if (frame.arr) {
+    let arr = frame.arr;
+    let arrY = 100;      // y-coordinate for main array display
+    let arrHeight = 200; // maximum height for bars
+    let barAreaWidth = width - 2 * margin;
+    let barWidth = barAreaWidth / arr.length;
+    let maxVal = Math.max(...arr);
+    
+    // Label for main array
+    textSize(14);
+    textAlign(LEFT, CENTER);
+    text("Main Array", margin, arrY - 20);
+    
+    for (let i = 0; i < arr.length; i++) {
+      let val = arr[i];
+      let barHeight = map(val, 0, maxVal, 0, arrHeight);
+      let x = margin + i * barWidth;
+      let y = arrY + (arrHeight - barHeight);
+      
+      // Default color for main array bars
+      let col = color(100, 149, 237);  // cornflower blue
+      
+      // Highlight the current index or bucket if indicated
+      if (frame.highlight) {
+        if (frame.highlight.current === i || frame.highlight.bucket === i) {
+          col = color(220, 20, 60);  // crimson for dramatic effect
+        }
+      }
+      
+      fill(col);
+      rect(x, y, barWidth - 2, barHeight);
+      
+      // Display the numerical value above each bar
+      fill(0);
+      textAlign(CENTER, BOTTOM);
+      text(arr[i], x + barWidth / 2, y - 5);
+    }
+  }
+  
+  // -------------------------
+  // Draw the Temp (Sorted) Array
+  // -------------------------
+  if (frame.temp) {
+    let temp = frame.temp;
+    let tempY = 350;     // y-coordinate for temp array display
+    let tempHeight = 150; // maximum bar height for temp array
+    let barAreaWidth = width - 2 * margin;
+    let barWidth = barAreaWidth / temp.length;
+    let maxVal = Math.max(...temp, 1);  // ensure non-zero maximum
+    
+    // Label for temp array
+    textSize(14);
+    textAlign(LEFT, CENTER);
+    text("Temp Array", margin, tempY - 20);
+    
+    for (let i = 0; i < temp.length; i++) {
+      let val = temp[i];
+      let barHeight = map(val, 0, maxVal, 0, tempHeight);
+      let x = margin + i * barWidth;
+      let y = tempY + (tempHeight - barHeight);
+      
+      // Default color for temp array bars
+      let col = color(34, 139, 34);  // forest green
+      
+      // Highlight the current insertion position if applicable
+      if (frame.highlight && frame.highlight.pos === i) {
+        col = color(255, 140, 0);    // dark orange
+      }
+      
+      fill(col);
+      rect(x, y, barWidth - 2, barHeight);
+      
+      // Display the numerical value above each temp bar
+      fill(0);
+      textAlign(CENTER, BOTTOM);
+      text(temp[i], x + barWidth / 2, y - 5);
+    }
+  }
+}
+```
