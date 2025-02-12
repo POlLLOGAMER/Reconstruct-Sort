@@ -496,3 +496,46 @@ function displayFrame(frame) {
   }
 }
 ```
+
+# As you can see, it has only 1 constraint that has to be a force between 1 and n, but we can remove this constraint by adding maximum value, and here is the code without that constraint:
+```
+import random
+import time
+
+# Deconstruction sort algorithm (In-place Sorting)
+def inplace_sorting(lst, max_val):
+    n = len(lst)
+    for num in lst:
+        if not (0 <= num <= max_val):  # Asegurarse que los números están dentro del rango
+            raise ValueError(f"All numbers must be in the range [0, {max_val}]")
+
+    # Realizar el conteo de frecuencia usando la técnica de "in-place"
+    for i in range(n):
+        index = lst[i] % (max_val + 1)  # Generar el índice dentro de un rango válido
+        if index < n:
+            lst[index] += n  # Sumar n para marcar el valor sin sobrescribir la lista
+
+    pos = 0
+    temp = [0] * n
+    for i in range(n):
+        freq = lst[i] // (max_val + 1)  # Obtener la frecuencia
+        for _ in range(freq):
+            temp[pos] = i
+            pos += 1
+    for i in range(n):
+        lst[i] = temp[i]
+    return lst
+
+if __name__ == "__main__":
+    # Generar una lista aleatoria con valores hasta 1 millón
+    max_val = 1000000
+    size = 10000  # Tamaño de la lista (puedes cambiarlo)
+    my_list = [random.randint(0, max_val) for _ in range(size)]
+
+    # Ordenar la lista utilizando Counting Sort 2
+    start_time = time.time()
+    sorted_list = inplace_sorting(my_list, max_val)
+    print(f"List sorted in {time.time() - start_time} seconds.")
+```
+#Benchmarks
+As you can see when the k is small, counting sort and Deconstruction sort have the same performance but when we increase the k for example to 1 million, we clearly see the difference between these 2, because 1 is O(n+k) and another is O(n):
