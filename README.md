@@ -166,3 +166,71 @@ if __name__ == "__main__":
 
 # Below you will see a graph which reflects the time-operation relationship of this algorithm
 ![Texto alternativo](/Graph.png)
+
+Here is the code I used to create the performance graph for this algorithm:
+
+```
+import time
+import random
+import matplotlib.pyplot as plt
+
+def inplace_sorting(list):
+    n = len(list)
+    operations = 0  # Variable para contar las operaciones
+
+    # Check that all elements are in the range [0, n)
+    for num in list:
+        if not (0 <= num < n):
+            raise ValueError("All numbers must be in the range [0, n)")
+
+    # Step 1: Count frequencies in-place
+    for i in range(n):
+        index = list[i] % n
+        list[index] += n
+        operations += 1  # Operación de incremento
+
+    # Step 2: Rebuild the sorted list (in-place)
+    pos = 0
+    temp = [0] * n  # Auxiliary list to help with sorting
+
+    for i in range(n):
+        freq = list[i] // n
+        for _ in range(freq):
+            temp[pos] = i
+            pos += 1
+            operations += 1  # Operación de asignación
+    for i in range(n):
+        list[i] = temp[i]
+        operations += 1  # Operación de copia
+
+    return list, operations
+
+# Function to plot graph
+def plot_operations():
+    sizes = range(100000, 10000001, 1000000)  # From 100000 to 10 million in steps of 1000000
+    operations_list = []
+
+    for size in sizes:
+        my_list = [random.randint(0, size - 1) for _ in range(size)]
+        
+        # Measure the number of operations performed by inplace_sorting
+        _, operations = inplace_sorting(my_list)
+
+        operations_list.append(operations)
+        print(f"Size: {size}, Operations: {operations}")
+
+    # Plotting the results
+    plt.figure(figsize=(10, 6))
+    plt.plot(sizes, operations_list, label="Number of Operations")
+    plt.xlabel('List Size')
+    plt.ylabel('Number of Operations')
+    plt.title('Number of Operations of In-place Sorting vs List Size')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+if __name__ == "__main__":
+    plot_operations()
+
+```
+
