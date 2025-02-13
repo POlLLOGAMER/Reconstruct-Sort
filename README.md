@@ -660,20 +660,20 @@ import time
 def flexible_inplace_sort(lst, max_val):
     n = len(lst)
     
-    # Validamos que cada número esté en el rango [0, max_val]
+    # Validate that each number is in the range [0, max_val]
     for num in lst:
         if num < 0 or num > max_val:
-            raise ValueError(f"Todos los números deben estar en el rango [0, {max_val}]")
+            raise ValueError(f"All numbers must be in the range [0, {max_val}]")
 
-    # Caso 1: Si max_val < n, usamos la versión optimizada O(n)
+    # Case 1: If max_val < n, use the optimized O(n) version
     if max_val < n:
-        multiplier = n  # n es mayor que cualquier valor en la lista
-        # Contabilizamos las frecuencias usando la misma lista
+        multiplier = n  # n is greater than any value in the list
+        # Count frequencies using the same list
         for i in range(n):
             index = lst[i] % multiplier
             lst[index] += n
         
-        # Reconstruimos la lista ordenada
+        # Reconstruct the sorted list
         pos = 0
         temp = [0] * n
         for i in range(max_val + 1):
@@ -685,13 +685,13 @@ def flexible_inplace_sort(lst, max_val):
             lst[i] = temp[i]
         return lst
 
-    # Caso 2: Si max_val >= n, utilizamos la versión "original" de Deconstruction Sort
+    # Case 2: If max_val >= n, use the "original" Deconstruction Sort version
     else:
-        # Realizamos el conteo de frecuencias usando la técnica "in-place"
+        # Perform frequency counting using the "in-place" technique
         for i in range(n):
             index = lst[i] % (max_val + 1)
             if index < n:
-                lst[index] += n  # Marcamos la frecuencia sumando n
+                lst[index] += n  # Mark the frequency by adding n
         
         pos = 0
         temp = [0] * n
@@ -706,16 +706,17 @@ def flexible_inplace_sort(lst, max_val):
         return lst
 
 
-# Ejemplo de uso:
+# Example usage:
 if __name__ == "__main__":
-    # Puedes probar con distintos tamaños y rangos
-    max_val = 10000**10000  # Prueba con un max_val gigante
-    size = 10000        # Tamaño de la lista
+    # You can test with different sizes and ranges
+    max_val = 10000**10000  # Test with a giant max_val
+    size = 10000        # List size
     my_list = [random.randint(0, max_val) for _ in range(size)]
 
     start_time = time.time()
     sorted_list = flexible_inplace_sort(my_list, max_val)
-    print(f"Lista ordenada en {time.time() - start_time} segundos.")
+    print(f"Sorted list in {time.time() - start_time} seconds.")
+
 
 
 ```
