@@ -709,7 +709,7 @@ def flexible_inplace_sort(lst, max_val):
 # Ejemplo de uso:
 if __name__ == "__main__":
     # Puedes probar con distintos tamaños y rangos
-    max_val = 1000000  # Prueba con un max_val gigante
+    max_val = 10000**10000  # Prueba con un max_val gigante
     size = 10000        # Tamaño de la lista
     my_list = [random.randint(0, max_val) for _ in range(size)]
 
