@@ -650,3 +650,86 @@ def plot_operations():
 if __name__ == "__main__":
     plot_operations()
 ```
+## Version 2
+In version 2, which is the code you will see below, I removed the restriction that the max value always had to be less than the size of the list, here is the code:
+
+```
+import random
+import time
+
+def flexible_inplace_sort(lst, max_val):
+    n = len(lst)
+    # Validate that each number is in the range [0, max_val]
+    for num in lst:
+        if not (0 <= num <= max_val):
+            raise ValueError(f"All numbers must be in the range [0, {max_val}]")
+    
+    # Case 1: If max_val < n, we can use the "direct" in-place version
+    if max_val < n:
+        multiplier = n  # n is greater than any value in the list
+        # Count frequencies using the same list
+        for i in range(n):
+            # Since the original values are in [0, max_val] and max_val < n,
+            # lst[i] % multiplier is the original value.
+            index = lst[i] % multiplier
+            # It's always safe because index < n
+            lst[index] += n  
+        
+        # Reconstruct the sorted list
+        pos = 0
+        temp = [0] * n
+        # Iterate only until max_val, because only those indices could receive frequencies
+        for i in range(max_val + 1):
+            freq = lst[i] // multiplier
+            for _ in range(freq):
+                temp[pos] = i
+                pos += 1
+        for i in range(n):
+            lst[i] = temp[i]
+        return lst
+    
+    # Case 2: If max_val >= n, we compress keys to reduce the range
+    else:
+        # Get distinct values and sort them
+        distinct = sorted(set(lst))
+        # Create a mapping: original value -> compressed index
+        mapping = {val: idx for idx, val in enumerate(distinct)}
+        inverse_mapping = {idx: val for idx, val in enumerate(distinct)}
+        
+        # Compress the list: each number is replaced by its compressed "key"
+        for i in range(n):
+            lst[i] = mapping[lst[i]]
+        m = len(distinct)  # New range: [0, m-1] (always m ≤ n)
+        
+        multiplier = n  # n is greater than or equal to m, so it works as the base
+        # Count frequencies using the compressed values
+        for i in range(n):
+            index = lst[i] % multiplier  # This value is in [0, m-1]
+            lst[index] += n
+        
+        pos = 0
+        temp = [0] * n
+        # Only traverse the "frequency cells" we used (0 to m-1)
+        for i in range(m):
+            freq = lst[i] // multiplier
+            for _ in range(freq):
+                temp[pos] = i
+                pos += 1
+        for i in range(n):
+            lst[i] = temp[i]
+        # Finally, decompress the values to recover the original
+        for i in range(n):
+            lst[i] = inverse_mapping[lst[i]]
+        return lst
+
+# Example usage:
+if __name__ == "__main__":
+    # You can test with different sizes and ranges
+    max_val = 1000000  # Test with a huge max_val
+    size = 10000       # List size
+    my_list = [random.randint(0, max_val) for _ in range(size)]
+
+    start_time = time.time()
+    sorted_list = flexible_inplace_sort(my_list, max_val)
+    print(f"List sorted in {time.time() - start_time} seconds.")
+```
