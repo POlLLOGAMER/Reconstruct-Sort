@@ -717,6 +717,80 @@ if __name__ == "__main__":
     sorted_list = flexible_inplace_sort(my_list, max_val)
     print(f"Sorted list in {time.time() - start_time} seconds.")
 
+```
+Here is the version that measures the operations:
+
+```
+import random
+import time
+
+def flexible_inplace_sort(lst, max_val):
+    n = len(lst)
+    operations = 0  # Variable to count operations
+    
+    # Validate that each number is in the range [0, max_val]
+    for num in lst:
+        if num < 0 or num > max_val:
+            raise ValueError(f"All numbers must be in the range [0, {max_val}]")
+        operations += 1  # Validation operation
+
+    # Case 1: If max_val < n, we use the optimized O(n) version
+    if max_val < n:
+        multiplier = n  # n is greater than any value in the list
+        # Count frequencies using the same list
+        for i in range(n):
+            index = lst[i] % multiplier
+            lst[index] += n
+            operations += 1  # Loop operation
+
+        # Rebuild the sorted list
+        pos = 0
+        temp = [0] * n
+        for i in range(max_val + 1):
+            freq = lst[i] // multiplier
+            for _ in range(freq):
+                temp[pos] = i
+                pos += 1
+                operations += 1  # Loop operation
+        for i in range(n):
+            lst[i] = temp[i]
+            operations += 1  # Loop operation
+        return lst, operations
+
+    # Case 2: If max_val >= n, we use the "original" Deconstruction Sort version
+    else:
+        # Perform frequency counting using the "in-place" technique
+        for i in range(n):
+            index = lst[i] % (max_val + 1)
+            if index < n:
+                lst[index] += n  # Mark the frequency by adding n
+            operations += 1  # Loop operation
+        
+        pos = 0
+        temp = [0] * n
+        for i in range(n):
+            freq = lst[i] // (max_val + 1)
+            for _ in range(freq):
+                temp[pos] = i
+                pos += 1
+                operations += 1  # Loop operation
+        for i in range(n):
+            lst[i] = temp[i]
+            operations += 1  # Loop operation
+        
+        return lst, operations
 
 
+# Example usage:
+if __name__ == "__main__":
+    max_val = 10000**10000  # Test with a giant max_val
+    size = 10000        # List size
+    my_list = [random.randint(0, max_val) for _ in range(size)]
+
+    start_time = time.time()
+    sorted_list, operations = flexible_inplace_sort(my_list, max_val)
+    end_time = time.time()
+
+    print(f"Sorted list in {end_time - start_time} seconds.")
+    print(f"Operations performed: {operations}")
 ```
