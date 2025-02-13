@@ -650,4 +650,78 @@ def plot_operations():
 if __name__ == "__main__":
     plot_operations()
 ```
+## Version 2
+In version 2, which is the code you will see below, I removed the restriction that the max value always had to be less than the size of the list, here is the code:
 
+```
+import random
+import time
+
+def flexible_inplace_sort(lst, max_val):
+    n = len(lst)
+    # Validamos que cada número esté en el rango [0, max_val]
+    for num in lst:
+        if not (0 <= num <= max_val):
+            raise ValueError(f"Todos los números deben estar en el rango [0, {max_val}]")
+    
+    # Caso 1: Si max_val < n, podemos usar la versión in-place “directa”
+    if max_val < n:
+        multiplier = n  # n es mayor que cualquier valor en la lista
+        # Contabilizamos las frecuencias usando la misma lista
+        for i in range(n):
+            # Como los valores originales están en [0, max_val] y max_val < n,
+            # lst[i] % multiplier es el valor original.
+            index = lst[i] % multiplier
+            # Siempre es seguro porque index < n
+            lst[index] += n  
+        
+        # Reconstruimos la lista ordenada
+        pos = 0
+        temp = [0] * n
+        # Solo iteramos hasta max_val, pues solo esos índices pudieron recibir frecuencias
+        for i in range(max_val + 1):
+            freq = lst[i] // multiplier
+            for _ in range(freq):
+                temp[pos] = i
+                pos += 1
+        for i in range(n):
+            lst[i] = temp[i]
+        return lst
+    
+    # Caso 2: Si max_val >= n, hacer uso de un conteo de frecuencias similar al Caso 1
+    else:
+        # Usamos el mismo paso de frecuencias para el conteo, pero con una modificación
+        multiplier = n  # n es mayor o igual que el número de valores únicos en la lista
+        # Contabilizamos las frecuencias usando la misma lista
+        for i in range(n):
+            # Los valores originales están en el rango [0, max_val]
+            # Modificamos la lista para agregar las frecuencias
+            index = lst[i] % multiplier
+            lst[index] += n
+        
+        # Reconstruimos la lista ordenada
+        pos = 0
+        temp = [0] * n
+        # Recorreremos la lista, pero solo hasta el máximo valor posible
+        for i in range(max_val + 1):
+            freq = lst[i] // multiplier
+            for _ in range(freq):
+                temp[pos] = i
+                pos += 1
+        for i in range(n):
+            lst[i] = temp[i]
+        
+        return lst
+
+# Ejemplo de uso:
+if __name__ == "__main__":
+    # Puedes probar con distintos tamaños y rangos
+    max_val = 1000  # Prueba con un max_val gigante
+    size = 10000        # Tamaño de la lista
+    my_list = [random.randint(0, max_val) for _ in range(size)]
+
+    start_time = time.time()
+    sorted_list = flexible_inplace_sort(my_list, max_val)
+    print(f"Lista ordenada en {time.time() - start_time} segundos.")
+
+```
